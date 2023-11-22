@@ -3,10 +3,14 @@ from django.db import models
 # Create your models here.
 
 class Usuario ( models.Model):
+    TipoUsuarios = [
+        (0, 'Persona sin Auto'),#0-Persona sin auto
+        (1, 'Conductor'),#1-COnductor
+    ]
     id_user = models.AutoField(primary_key=True)
     user = models.CharField(max_length=30)
     password = models.CharField(max_length=30)
-    tipo_user = models.IntegerField()
+    tipo_user = models.IntegerField(choices=TipoUsuarios)
 
     def __str__(self):
         return self.user
