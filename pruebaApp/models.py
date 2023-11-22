@@ -18,6 +18,7 @@ class Viaje (models.Model):
     destino = models.CharField(max_length=30)
     salida = models.CharField(max_length=15)
     capacidad = models.IntegerField()
+    precio = models.IntegerField()
 
     def __str__(self) :
         return self.patente
