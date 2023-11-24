@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
 from .models import Usuario, Viaje
@@ -9,6 +10,9 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.parsers import JSONParser
+
+
+from django.core.mail import send_mail
 
 
 
@@ -99,8 +103,24 @@ def detalle_viaje (request,id):
     if request.method =='DELETE':
         viaje.delete()
         return Response(status=status.HTTP_204_NO_CONTENT) 
+    
+@api_view(['POST'])
+def enviar_correo(request):
+    destinatario = request.POST.get('destinatario')
+    asunto = request.POST.get('asunto')
+    cuerpo = request.POST.get('cuerpo')
 
-
+    try:
+        send_mail(
+            asunto,
+            cuerpo,
+            'tellevoapp01@gmail.com',
+            [destinatario],
+            fail_silently=False,
+        )
+        return JsonResponse({'mensaje': 'Correo enviado con éxito'})
+    except Exception as e:
+        return Response
 
 
     
