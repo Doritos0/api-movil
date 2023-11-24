@@ -1,3 +1,4 @@
+import json
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
@@ -105,10 +106,21 @@ def detalle_viaje (request,id):
         return Response(status=status.HTTP_204_NO_CONTENT) 
     
 @api_view(['POST'])
+@csrf_exempt
 def enviar_correo(request):
-    destinatario = request.POST.get('destinatario')
-    asunto = request.POST.get('asunto')
-    cuerpo = request.POST.get('cuerpo')
+    if request.content_type == 'application/json':
+        # Si la solicitud es de tipo JSON, parsea los datos del cuerpo
+        data = json.loads(request.body)
+        destinatario = data.get('destinatario')
+        asunto = data.get('asunto')
+        cuerpo = data.get('cuerpo')
+    elif request.content_type == 'multipart/form-data':
+        # Si la solicitud es de tipo form-data, obtén los datos del formulario
+        destinatario = request.POST.get('destinatario')
+        asunto = request.POST.get('asunto')
+        cuerpo = request.POST.get('cuerpo')
+    else:
+        return JsonResponse({'error': 'Formato de solicitud no soportado'}, status=400)
 
     try:
         send_mail(
@@ -120,8 +132,6 @@ def enviar_correo(request):
         )
         return JsonResponse({'mensaje': 'Correo enviado con éxito'})
     except Exception as e:
-        return Response
-
-
+        return JsonResponse({'error': str(e)}, status=500)
     
 
