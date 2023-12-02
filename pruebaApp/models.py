@@ -7,8 +7,8 @@ class Usuario ( models.Model):
         (0, 'Persona sin Auto'),#0-Persona sin auto
         (1, 'Conductor'),#1-COnductor
     ]
-    id_user = models.AutoField(primary_key=True)
     user = models.CharField(max_length=30)
+    mail = models.CharField(max_length=40)
     password = models.CharField(max_length=30)
     tipo_user = models.IntegerField(choices=TipoUsuarios)
 

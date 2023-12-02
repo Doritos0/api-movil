@@ -109,13 +109,11 @@ def detalle_viaje (request,id):
 @csrf_exempt
 def enviar_correo(request):
     if request.content_type == 'application/json':
-        # Si la solicitud es de tipo JSON, parsea los datos del cuerpo
         data = json.loads(request.body)
         destinatario = data.get('destinatario')
         asunto = data.get('asunto')
         cuerpo = data.get('cuerpo')
     elif request.content_type == 'multipart/form-data':
-        # Si la solicitud es de tipo form-data, obtén los datos del formulario
         destinatario = request.POST.get('destinatario')
         asunto = request.POST.get('asunto')
         cuerpo = request.POST.get('cuerpo')
