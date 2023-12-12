@@ -7,10 +7,20 @@ class Usuario ( models.Model):
         (0, 'Persona sin Auto'),#0-Persona sin auto
         (1, 'Conductor'),#1-COnductor
     ]
+    ViajeIda = [
+        (0, 'Sin Viaje Ida'),#0-Sin Viaje Ida
+        (1, 'Viaje Ida Tomado'),#1-Viaje Ida Tomado
+    ]
+    ViajeVuelta = [
+        (0, 'Sin Viaje Vuelta'),#0-Sin Viaje Vuelta
+        (1, 'Viaje Vuelta Tomado'),#1-Viaje Vuelta Tomado
+    ]
     user = models.CharField(max_length=30, primary_key=True)
     mail = models.CharField(max_length=40, unique=True)
     password = models.CharField(max_length=30)
     tipo_user = models.IntegerField(choices=TipoUsuarios)
+    viaje_ida = models.IntegerField(choices=ViajeIda)
+    viaje_vuelta = models.IntegerField(choices=ViajeVuelta)
 
     def __str__(self):
         return self.user
