@@ -2,8 +2,8 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
-from .models import Usuario, Viaje
-from .serializers import UsuarioSerializer, ViajeSerializer
+from .models import Usuario, Viaje, ViajeTomado
+from .serializers import UsuarioSerializer, ViajeSerializer, ViajeTomadoSerializer
 
 # CREACION DE API
 from rest_framework.decorators import api_view
@@ -89,7 +89,7 @@ def lista_viaje(request):
 def detalle_viaje (request,id):
     try:
         viaje = Viaje.objects.get(patente=id)
-    except Usuario.DoesNotExist:
+    except Viaje.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         serilizer = ViajeSerializer(viaje)
@@ -105,6 +105,50 @@ def detalle_viaje (request,id):
         viaje.delete()
         return Response(status=status.HTTP_204_NO_CONTENT) 
     
+@api_view(['GET','POST'])
+def viajeTomado (request):
+    if request.method == 'GET':
+        query = ViajeTomado.objects.all()
+        serializer = ViajeTomadoSerializer(query, many = True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        
+        serializer = ViajeTomadoSerializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            usuario = serializer.validated_data.get('usuario')
+            viaje = serializer.validated_data.get('viaje')
+            
+            existe_registro = ViajeTomado.objects.filter(usuario=usuario, viaje=viaje).exists()
+
+            if existe_registro:
+                return Response({"error": "Ya existe un registro para este usuario y viaje."}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+@api_view(['GET','PUT','DELETE'])
+def detalle_viaje_tomado (request,id):
+    try:
+        viaje = ViajeTomado.objects.get(id_viaje=id)
+    except ViajeTomado.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        serilizer = ViajeTomadoSerializer(viaje)
+        return Response(serilizer.data)
+    if request.method == 'PUT':
+        serilizer = ViajeTomadoSerializer(viaje,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data)
+        else:
+            return Response(serilizer.errors,status=status.HTTP_404_NOT_FOUND)
+    if request.method =='DELETE':
+        viaje.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT) 
+
 @api_view(['POST'])
 @csrf_exempt
 def enviar_correo(request):
